@@ -1,0 +1,82 @@
+buildscript{
+    repositories{
+        mavenLocal()
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath('com.google.protobuf:protobuf-gradle-plugin:0.8.11')
+        classpath("gradle.plugin.com.zeroc.gradle.ice-builder:slice:1.4.7")
+    }
+}
+
+plugins {
+    id 'java'
+    id 'com.google.protobuf' version '0.8.11'
+    id "com.zeroc.gradle.ice-builder.slice" version "1.4.7"
+}
+
+group 'com.m51das.netty'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories{
+    mavenCentral()
+}
+
+dependencies {
+    compile (
+            "io.netty:netty-all:4.1.45.Final",
+            "com.google.protobuf:protobuf-java:3.11.4",
+            "com.google.protobuf:protobuf-java-util:3.11.4",
+            
+            "org.apache.thrift:libthrift:0.13.0",
+            
+            'io.grpc:grpc-netty-shaded:1.27.1',
+            'io.grpc:grpc-protobuf:1.27.1',
+            'io.grpc:grpc-stub:1.27.1',
+            
+            'org.apache.avro:avro:1.9.2',
+            'org.apache.avro:avro-ipc-netty:1.9.2',
+
+            'com.zeroc:ice:3.6.5',
+            'com.zeroc:icebox:3.6.5'
+    )
+
+    testCompile (
+            "junit:junit:4.12"
+    )
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.11.0"
+    }
+    plugins {
+        grpc {
+            artifact = 'io.grpc:protoc-gen-grpc-java:1.27.1'
+        }
+    }
+    // 自动生成的类放置目录
+    generatedFilesBaseDir='src'
+    generateProtoTasks {
+        all()*.plugins {
+            grpc {
+                // 生成grpc的service目录
+                setOutputSubDir 'java'
+            }
+        }
+    }
+}
+
+sourceSets{
+    main{
+        proto{
+            srcDir 'src/idl/protobuf'
+        }
+    }
+}
